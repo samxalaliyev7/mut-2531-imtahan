@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AMİK MUT-2531aqa - İmtahan Sistemi</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --warning: #d97706;
+      --border: #e5e7eb;
+      --soft: #eef2ff;
+      --table: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); }
+    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: 0; z-index: 10; }
+    .brand h1 { margin: 0; font-size: 19px; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .container { max-width: 1160px; margin: 24px auto; padding: 0 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06); }
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    @media (max-width: 860px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } header { flex-direction: column; align-items: flex-start; } .exam-topbar { flex-direction: column; align-items: stretch; top: 105px; } }
+    input, select, textarea, button { font: inherit; }
+    input, textarea, select { width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px; background: white; outline: none; }
+    label { font-weight: 700; display: block; margin: 0 0 7px; font-size: 14px; }
+    .field { margin-bottom: 14px; }
+    .btn { border: none; border-radius: 10px; padding: 11px 16px; background: var(--primary); color: white; cursor: pointer; font-weight: 700; transition: 0.15s ease; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+    .btn:hover { background: var(--primary-dark); }
+    .btn.secondary { background: #374151; }
+    .btn.danger { background: var(--danger); }
+    .btn.success { background: var(--success); }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 6px 10px; background: var(--soft); color: var(--primary-dark); font-size: 13px; font-weight: 700; }
+    .login-box { max-width: 450px; margin: 42px auto; }
+    .small { font-size: 13px; }
+    .alert { padding: 12px 14px; border-radius: 10px; margin: 12px 0; border: 1px solid var(--border); background: #f9fafb; }
+    .alert.success { border-color: #bbf7d0; background: #f0fdf4; color: #14532d; }
+    .alert.warn { border-color: #fde68a; background: #fffbeb; color: #78350f; }
+    .alert.danger { border-color: #fecaca; background: #fef2f2; color: #7f1d1d; }
+    .exam-topbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; position: sticky; top: 80px; z-index: 9; background: var(--bg); padding: 8px 0; }
+    .timer { display: flex; align-items: center; gap: 10px; background: #111827; color: white; border-radius: 14px; padding: 12px 16px; font-weight: 800; min-width: 170px; justify-content: center; letter-spacing: .5px; }
+    .timer.low { background: var(--danger); }
+    .hourglass { width: 22px; height: 30px; position: relative; animation: rotateHourglass 2.5s linear infinite; display: inline-block; }
+    .hourglass::before, .hourglass::after { content: ""; position: absolute; left: 3px; width: 16px; height: 12px; border: 2px solid currentColor; }
+    .hourglass::before { top: 0; border-bottom: none; border-radius: 4px 4px 1px 1px; }
+    .hourglass::after { bottom: 0; border-top: none; border-radius: 1px 1px 4px 4px; }
+    @keyframes rotateHourglass { 0%, 42% { transform: rotate(0deg); } 50%, 92% { transform: rotate(180deg); } 100% { transform: rotate(360deg); } }
+    .question-card { border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; background: white; }
+    .question-head { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 14px; font-weight: 800; line-height: 1.45; }
+    .qnum { min-width: 36px; height: 36px; border-radius: 50%; background: var(--soft); color: var(--primary-dark); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+    .content-img { display: block; max-width: min(100%, 560px); height: auto; margin-top: 8px; padding: 4px; background: #fff; border-radius: 8px; border: 1px solid #eef2f7; }
+    .option { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; margin: 8px 0; cursor: pointer; background: #fbfdff; line-height: 1.35; }
+    .option:hover { border-color: #93c5fd; background: #eff6ff; }
+    .option input { width: auto; margin-top: 3px; flex-shrink: 0; }
+    .option-body { flex: 1; }
+    .status-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    table { width: 100%; border-collapse: collapse; background: white; overflow: hidden; border-radius: 12px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+    th { background: var(--table); color: #374151; }
+    tr:last-child td { border-bottom: 0; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+    .kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; background: #111827; color: white; border-radius: 6px; padding: 2px 6px; font-size: 12px; }
+    .result-big { font-size: 44px; margin: 4px 0; font-weight: 900; color: var(--primary-dark); }
+    .footer-note { margin-top: 16px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .subject-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: #fbfdff; }
+    .subject-card h4 { margin: 0 0 8px; }
+    .subject-card p { margin: 0; color: var(--muted); font-size: 13px; }
+    .subject-warning { color: var(--warning); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Azərbaycan Maliyyə-İqtisad Kolleci</h1>
+      <p>MUT-2531aqa qrupu üçün 4 fənn üzrə imtahan test sistemi</p>
+    </div>
+    <div id="userBadge" class="pill hidden"></div>
+  </header>
+
+  <main class="container">
+    <section id="loginView" class="login-box card">
+      <h2>Daxil ol</h2>
+      <p class="muted">İmtahana başlamaq üçün login və parol daxil edin.</p>
+      <div class="field">
+        <label for="username">Login</label>
+        <input id="username" autocomplete="username" placeholder="məsələn: student1">
+      </div>
+      <div class="field">
+        <label for="password">Parol</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="məsələn: 2531">
+      </div>
+      <button class="btn" id="loginBtn">Daxil ol</button>
+      <div class="alert warn small">
+        <b>Giriş nümunəsi:</b><br>
+        Admin: <span class="kbd">admin</span> / <span class="kbd">admin2531</span><br>
+        Tələbə login/parolları ayrıca şəxsi CSV faylındadır; public GitHub reposuna əlavə etməyin.
+      </div>
+    </section>
+
+    <section id="studentView" class="hidden">
+      <div class="card">
+        <h2>İmtahan paneli</h2>
+        <p class="muted">
+          Fənni seçin və imtahana başlayın. Hər cəhddə sualların sırası və cavab variantlarının yerləri qarışdırılır.
+          Düzgün cavab Excel fayllarında birinci cavab sütunu, yəni A variantı kimi qəbul edilib.
+        </p>
+        <div class="grid grid-2">
+          <div class="field">
+            <label for="subjectSelect">Fənn seçimi</label>
+            <select id="subjectSelect"></select>
+          </div>
+          <div class="field">
+            <label>İmtahan qaydası</label>
+            <div class="alert small" style="margin:0;">50 sual · 50 dəqiqə · 5 variant</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn success" id="startExamBtn">İmtahana başla</button>
+          <button class="btn ghost" id="studentResultsBtn">Nəticələrim</button>
+          <button class="btn secondary" id="logoutBtn1">Çıxış</button>
+        </div>
+        <div id="studentInfoBox" class="alert"></div>
+      </div>
+      <div id="studentResultsBox" class="card hidden" style="margin-top:16px;"></div>
+    </section>
+
+    <section id="examView" class="hidden">
+      <div class="exam-topbar">
+        <div>
+          <div class="pill" id="examSubjectPill">Fənn</div>
+          <div class="small muted" id="answeredCounter" style="margin-top:6px;">Cavablanıb: 0 / 50</div>
+        </div>
+        <div class="timer" id="timerBox">
+          <span class="hourglass" aria-hidden="true"></span>
+          <span id="timerText">50:00</span>
+        </div>
+      </div>
+      <form id="examForm"></form>
+      <div class="card">
+        <div class="toolbar">
+          <button class="btn success" id="submitExamBtn" type="button">İmtahanı bitir</button>
+          <button class="btn ghost" id="scrollTopBtn" type="button">Yuxarı qayıt</button>
+        </div>
+        <p class="footer-note">Vaxt bitəndə imtahan avtomatik yekunlaşacaq.</p>
+      </div>
+    </section>
+
+    <section id="resultView" class="hidden">
+      <div class="card">
+        <h2>İmtahan nəticəsi</h2>
+        <div class="pill" id="resultSubject"></div>
+        <div class="result-big" id="resultScore"></div>
+        <p id="resultDetails" class="muted"></p>
+        <div class="toolbar">
+          <button class="btn" id="backToPanelBtn">Panelə qayıt</button>
+          <button class="btn ghost" id="reviewAnswersBtn">Cavabları nəzərdən keçir</button>
+        </div>
+      </div>
+      <div id="reviewBox" class="card hidden" style="margin-top:16px;"></div>
+    </section>
+
+    <section id="adminView" class="hidden">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Admin panel</h2>
+          <p class="muted">4 fənn üzrə suallar sistemə daxil edilib. Score Board nəticələri fənn üzrə ayrıca izləməyə imkan verir.</p>
+          <div class="status-row">
+            <span class="pill" id="subjectCountPill">Fənn: 0</span>
+            <span class="pill" id="questionCountPill">Sual: 0</span>
+            <span class="pill" id="studentCountPill">Tələbə: 0</span>
+            <span class="pill" id="resultCountPill">Nəticə: 0</span>
+          </div>
+          <div class="toolbar">
+            <button class="btn ghost" id="downloadScoresBtn">Nəticələri CSV yüklə</button>
+            <button class="btn ghost" id="downloadCredentialsBtn">Login-parolları CSV yüklə</button>
+            <button class="btn danger" id="resetResultsBtn">Nəticələri sil</button>
+            <button class="btn secondary" id="logoutBtn2">Çıxış</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Yeni tələbə əlavə et</h3>
+          <div class="field"><label for="newStudentName">Ad Soyad</label><input id="newStudentName" placeholder="məsələn: Aysel Məmmədova"></div>
+          <div class="field"><label for="newStudentUser">Login</label><input id="newStudentUser" placeholder="məsələn: aysel2531"></div>
+          <div class="field"><label for="newStudentPass">Parol</label><input id="newStudentPass" placeholder="məsələn: 2531"></div>
+          <button class="btn" id="addStudentBtn">Tələbəni əlavə et</button>
+          <div id="addStudentMsg"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>Yüklənmiş fənlər</h3>
+        <div id="subjectsBox" class="grid grid-2"></div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>Score Board</h3>
+        <div class="grid grid-2">
+          <div class="field">
+            <label for="scoreboardSubjectFilter">Fənn üzrə filter</label>
+            <select id="scoreboardSubjectFilter"></select>
+          </div>
+        </div>
+        <div class="toolbar"><button class="btn ghost" id="refreshScoreboardBtn">Yenilə</button></div>
+        <div id="scoreboardBox"></div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h3>Tələbələr</h3>
+        <div id="studentsBox"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="questions-data.js"></script>
+  <script>
+    (function () {
+      const CONFIG = {
+        examTitle: "MUT-2531aqa Pilot İmtahanı",
+        group: "MUT-2531aqa",
+        questionsPerExam: 50,
+        examMinutes: 50
+      };
+
+      const STORAGE = {
+        users: "amik2531_github_v1_users",
+        results: "amik2531_github_v1_results",
+        session: "amik2531_github_v1_session"
+      };
+
+      const SUBJECTS = Array.isArray(window.EXAM_SUBJECTS) ? window.EXAM_SUBJECTS : [];
+      let currentUser = null;
+      let currentExam = null;
+      let lastResult = null;
+      let timerInterval = null;
+
+      function defaultUsers() {
+        return [
+          {
+                    "username": "admin",
+                    "passwordHash": "2c30871c22a390b27207b845f8672fbc0bf7b846e8b70c3d56f1cf2908f3abcc",
+                    "role": "admin",
+                    "fullName": "Admin",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "durdana.agayeva",
+                    "passwordHash": "6dca8e983b79a1b87d700bc2fb9bc5ca790550bc34c8bce3eaf25cf338d2a5ed",
+                    "role": "student",
+                    "fullName": "Ağayeva Dürdana Sadiq qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "cefer.atayev",
+                    "passwordHash": "e6842319809aee1585d9386ece6de0a9dd2f2a110240b164dc7ecbda924543f0",
+                    "role": "student",
+                    "fullName": "Atayev Cəfər Məhəmməd oğlu",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "aysel.cebiyeva",
+                    "passwordHash": "51633fc1ac465f4d6d5ed0de68249d690950f08cda30d004f914f0229d52e8a0",
+                    "role": "student",
+                    "fullName": "Cəbiyeva Aysel Mehman qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "mirisrayil.ceferli",
+                    "passwordHash": "2882ef6395ed5f349770d8b49b28080cfa906017714ab882ad32edf3ce51e304",
+                    "role": "student",
+                    "fullName": "Cəfərli Mirisrayıl Vilayət oğlu",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "munevver.ceferova",
+                    "passwordHash": "cd8ae884c8df6fb3f54f17f7f328f548caeda2557907cbece9488e94875ed258",
+                    "role": "student",
+                    "fullName": "Cəfərova Münəvvər Elnur qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "gunay.eliyeva",
+                    "passwordHash": "741d674e084cf11c098c89a5c53a9fe5df92134b1995017a90b570cf500cee18",
+                    "role": "student",
+                    "fullName": "Əliyeva Günay Oktay qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "humay.eliyeva",
+                    "passwordHash": "5f27a7c58d9f2c96d1276935fcc9f189c8de6b9537e6caaab35e7555fd789daa",
+                    "role": "student",
+                    "fullName": "Əliyeva Humay Vasif qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "nurane.eliyeva",
+                    "passwordHash": "9aec8e37dea549f3b869bbed22975867a8fe5f6b5a462b4e53bdf924bdae009a",
+                    "role": "student",
+                    "fullName": "Əliyeva Nuranə Qinyaz qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "arzu.esgerova",
+                    "passwordHash": "01aba40471f89ebb596d49d2fda4329b7576d86c19e93bedf245a0f813d5024c",
+                    "role": "student",
+                    "fullName": "Əsgərova Arzu Qüdrət qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "rafil.fehradli",
+                    "passwordHash": "01a395beb7fafde3ff90714309ce8fbbc6feacf918870960f3b800d78ee6ab49",
+                    "role": "student",
+                    "fullName": "Fəhradlı Rafil Seyfəddin oğlu",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "aysun.hesenova",
+                    "passwordHash": "23f18ccce8dcfeaf8955483218d8224d82671052880a727e846e2d9e2b722624",
+                    "role": "student",
+                    "fullName": "Həsənova Aysun Azər qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "metanet.hesenova",
+                    "passwordHash": "4654d8aee359b163e2548a3adc8ee0ed91584ba3925cc95c5ce047328594cdf9",
+                    "role": "student",
+                    "fullName": "Həsənova Mətanət Məcid qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "saray.hidayetova",
+                    "passwordHash": "da34694714055f0e0c698fa4cdef4a4c4ee6441cb4f31b410279811aa38f4dbf",
+                    "role": "student",
+                    "fullName": "Hidayətova Saray Müseyib qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "gunel.huseynova",
+                    "passwordHash": "babcba13c5de25420a321d115afc8adadec96788213e6aa5c43077946a0fc687",
+                    "role": "student",
+                    "fullName": "Hüseynova Günel Fərrəməz qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "seyyare.huseynova",
+                    "passwordHash": "02e27ba14133905c50fd0563d80b5c1b0a9dea21711518880b019c92f15d9f5b",
+                    "role": "student",
+                    "fullName": "Hüseynova Səyyarə Rahil qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "isgender.quliyev",
+                    "passwordHash": "8fad1064c0d677a9402b8a747d3853deda261fa3de65a86302c313fb87a4191b",
+                    "role": "student",
+                    "fullName": "Quliyev İsgəndər Abbas oğlu",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "nermin.quliyeva",
+                    "passwordHash": "8d3e4135cb0782d9c819c0615a1a5eadcf93e48d9e913dc1572a7bf69c496bd7",
+                    "role": "student",
+                    "fullName": "Quliyeva Nərmin Vaqif qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "gunel.mahmudova",
+                    "passwordHash": "2ad68d994492c8583aa48050f25321d1a679aacbb5eb5edefeca3d4fd362e4fc",
+                    "role": "student",
+                    "fullName": "Mahmudova Günel Gündüz qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "ilahe.memmedova",
+                    "passwordHash": "c1746023737441e06d1d05d9d07af060baedc46804fcff36ae1b68501cad15ff",
+                    "role": "student",
+                    "fullName": "Məmmədova İlahə Abbas qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "yegane.musayeva",
+                    "passwordHash": "8a6111185dcff563f55aec15ac7a814153fa564efc026f61d2cebc338f515370",
+                    "role": "student",
+                    "fullName": "Musayeva Yeganə Bəhman qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "ayten.mustafayeva",
+                    "passwordHash": "06efa7b8940709126d929b2236fc7901a604c938d0d6f1fd338f0ccfec6d2fb3",
+                    "role": "student",
+                    "fullName": "Mustafayeva Aytən Mayis qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "vusale.pasayeva",
+                    "passwordHash": "f913679c2ff613db293075dea92f147f678a95a2ae807594b0cbfe103294c467",
+                    "role": "student",
+                    "fullName": "Paşayeva Vüsalə Mübariz qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "yagmur.rzazade",
+                    "passwordHash": "4857eac7dfb6beb12887af8ebb817e8dc42a2f0ce97c14b904b828dc66f15613",
+                    "role": "student",
+                    "fullName": "Rzazadə Yağmur Camal qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "fenare.sadiqova",
+                    "passwordHash": "26c9dc0deac437150f3e8dbc3eb93c3d3bc00b1ff180b8efdedb91f0e1cf2b16",
+                    "role": "student",
+                    "fullName": "Sadiqova Fənarə Sarı qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "roya.seyfeliyeva",
+                    "passwordHash": "3230af594bb31866586a537d93671ca6688236a1a0a1e0afefab6b1c8ff403e4",
+                    "role": "student",
+                    "fullName": "Seyfəliyeva Röya Yavar qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "zuleyxa.teyubova",
+                    "passwordHash": "d67c6d6c770e576dca373bd87fffe1da2841397ad1818b1737f0246f096789e6",
+                    "role": "student",
+                    "fullName": "Teyubova Züleyxa Murtuz qızı",
+                    "group": "MUT-2531aqa"
+          },
+          {
+                    "username": "kemine.verdiyeva",
+                    "passwordHash": "b0ea34543d2d9b1d8fcb23d7c07084da5b97313ff4af37251ba7efca5fbbd177",
+                    "role": "student",
+                    "fullName": "Verdiyeva Kəminə Rizvan qızı",
+                    "group": "MUT-2531aqa"
+          }
+];
+      }
+
+      function getJSON(key, fallback) {
+        try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+      }
+      function setJSON(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+      function initStorage() {
+        if (!localStorage.getItem(STORAGE.users)) setJSON(STORAGE.users, defaultUsers());
+        if (!localStorage.getItem(STORAGE.results)) setJSON(STORAGE.results, []);
+      }
+      function $(id) { return document.getElementById(id); }
+      function show(viewId) {
+        ["loginView", "studentView", "examView", "resultView", "adminView"].forEach(id => $(id).classList.add("hidden"));
+        $(viewId).classList.remove("hidden");
+      }
+      function setBadge() {
+        const badge = $("userBadge");
+        if (!currentUser) { badge.classList.add("hidden"); badge.textContent = ""; return; }
+        badge.classList.remove("hidden");
+        badge.textContent = `${currentUser.fullName} · ${currentUser.role === "admin" ? "Admin" : CONFIG.group}`;
+      }
+      async function sha256Hex(text) {
+        const data = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+      }
+      async function findUser(username, password) {
+        const users = getJSON(STORAGE.users, []);
+        const user = users.find(u => u.username === username);
+        if (!user) return null;
+        if (user.passwordHash) {
+          const inputHash = await sha256Hex(password);
+          return inputHash === user.passwordHash ? user : null;
+        }
+        return user.password === password ? user : null;
+      }
+      async function login() {
+        const username = $("username").value.trim();
+        const password = $("password").value.trim();
+        const user = await findUser(username, password);
+        if (!user) { alert("Login və ya parol yanlışdır."); return; }
+        currentUser = user;
+        setJSON(STORAGE.session, { username: user.username });
+        setBadge();
+        if (user.role === "admin") { renderAdmin(); show("adminView"); } else { renderStudentPanel(); show("studentView"); }
+      }
+      function logout() {
+        if (timerInterval) clearInterval(timerInterval);
+        currentUser = null; currentExam = null; lastResult = null;
+        localStorage.removeItem(STORAGE.session);
+        $("username").value = ""; $("password").value = "";
+        setBadge(); show("loginView");
+      }
+      function shuffle(array) {
+        const copy = [...array];
+        for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; }
+        return copy;
+      }
+      function selectedSubject() {
+        const id = $("subjectSelect").value;
+        return SUBJECTS.find(s => s.id === id);
+      }
+      function renderSubjectSelects() {
+        const opts = SUBJECTS.map(s => `<option value="${escapeAttr(s.id)}">${escapeHTML(s.title)} (${s.questions.length} sual)</option>`).join("");
+        $("subjectSelect").innerHTML = opts;
+        $("scoreboardSubjectFilter").innerHTML = `<option value="all">Bütün fənlər</option>` + opts;
+      }
+      function startExam() {
+        const subject = selectedSubject();
+        if (!subject) { alert("Fənn seçin."); return; }
+        const bank = Array.isArray(subject.questions) ? subject.questions : [];
+        if (bank.length === 0) { alert("Bu fənn üzrə sual yoxdur."); return; }
+        const selected = shuffle(bank).slice(0, Math.min(CONFIG.questionsPerExam, bank.length)).map((q, index) => ({
+          examIndex: index + 1,
+          sourceId: q.id,
+          originalNo: q.no,
+          topic: q.topic,
+          difficulty: q.difficulty,
+          question: q.question,
+          missingQuestionText: !!q.missingQuestionText,
+          options: shuffle(q.options).map((opt, optIndex) => ({
+            label: String.fromCharCode(65 + optIndex),
+            text: opt.text || "",
+            images: opt.images || [],
+            isCorrect: !!opt.isCorrect
+          })),
+          selectedLabel: null
+        }));
+        currentExam = {
+          id: "EXAM-" + Date.now(),
+          subjectId: subject.id,
+          subjectTitle: subject.title,
+          user: currentUser,
+          startedAt: new Date().toISOString(),
+          durationSeconds: CONFIG.examMinutes * 60,
+          remainingSeconds: CONFIG.examMinutes * 60,
+          questions: selected
+        };
+        renderExam(); show("examView"); startTimer(); window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      function renderExam() {
+        const form = $("examForm");
+        form.innerHTML = "";
+        $("examSubjectPill").textContent = `${currentExam.subjectTitle} · ${currentExam.questions.length} sual / 50 dəqiqə`;
+        currentExam.questions.forEach(q => {
+          const card = document.createElement("div");
+          card.className = "question-card";
+          const warning = q.missingQuestionText ? `<div class="small subject-warning">Qeyd: bu sualın mətni Excel faylında boş görünüb.</div>` : "";
+          card.innerHTML = `
+            <div class="question-head">
+              <span class="qnum">${q.examIndex}</span>
+              <span>${contentToHTML(q.question, "Sual mətni yoxdur")}${warning}</span>
+            </div>
+          `;
+          q.options.forEach(opt => {
+            const label = document.createElement("label");
+            label.className = "option";
+            label.innerHTML = `
+              <input type="radio" name="q${q.examIndex}" value="${opt.label}">
+              <span class="option-body"><b>${opt.label})</b> ${contentToHTML({ text: opt.text, images: opt.images }, "Variant mətni boşdur")}</span>
+            `;
+            label.querySelector("input").addEventListener("change", () => { q.selectedLabel = opt.label; updateAnsweredCounter(); });
+            card.appendChild(label);
+          });
+          form.appendChild(card);
+        });
+        updateAnsweredCounter();
+      }
+      function updateAnsweredCounter() {
+        if (!currentExam) return;
+        const answered = currentExam.questions.filter(q => q.selectedLabel).length;
+        $("answeredCounter").textContent = `Cavablanıb: ${answered} / ${currentExam.questions.length}`;
+      }
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        updateTimerText();
+        timerInterval = setInterval(() => {
+          if (!currentExam) return;
+          currentExam.remainingSeconds -= 1;
+          updateTimerText();
+          if (currentExam.remainingSeconds <= 0) { clearInterval(timerInterval); finishExam(true); }
+        }, 1000);
+      }
+      function updateTimerText() {
+        if (!currentExam) return;
+        const seconds = Math.max(0, currentExam.remainingSeconds);
+        const m = Math.floor(seconds / 60), s = seconds % 60;
+        $("timerText").textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+        $("timerBox").classList.toggle("low", seconds <= 300);
+      }
+      function finishExam(autoSubmit) {
+        if (!currentExam) return;
+        if (!autoSubmit) {
+          const unanswered = currentExam.questions.filter(q => !q.selectedLabel).length;
+          if (unanswered > 0 && !confirm(`${unanswered} sual cavabsızdır. İmtahanı bitirmək istəyirsiniz?`)) return;
+        }
+        if (timerInterval) clearInterval(timerInterval);
+        const correct = currentExam.questions.filter(q => {
+          const selected = q.options.find(o => o.label === q.selectedLabel);
+          return selected && selected.isCorrect;
+        }).length;
+        const answered = currentExam.questions.filter(q => q.selectedLabel).length;
+        const wrong = answered - correct;
+        const unanswered = currentExam.questions.length - answered;
+        const percent = Math.round((correct / currentExam.questions.length) * 100);
+        const spentSeconds = currentExam.durationSeconds - Math.max(0, currentExam.remainingSeconds);
+        const result = {
+          examId: currentExam.id,
+          examTitle: CONFIG.examTitle,
+          subjectId: currentExam.subjectId,
+          subjectTitle: currentExam.subjectTitle,
+          username: currentUser.username,
+          fullName: currentUser.fullName,
+          group: currentUser.group || CONFIG.group,
+          correct, wrong, unanswered,
+          total: currentExam.questions.length,
+          percent, spentSeconds,
+          startedAt: currentExam.startedAt,
+          finishedAt: new Date().toISOString(),
+          autoSubmit: !!autoSubmit,
+          answers: currentExam.questions.map(q => {
+            const correctOpt = q.options.find(o => o.isCorrect);
+            const selectedOpt = q.options.find(o => o.label === q.selectedLabel);
+            return {
+              no: q.examIndex,
+              originalNo: q.originalNo,
+              question: contentSummary(q.question),
+              selected: selectedOpt ? `${selectedOpt.label}) ${optionSummary(selectedOpt)}` : "Cavab verilməyib",
+              correct: correctOpt ? `${correctOpt.label}) ${optionSummary(correctOpt)}` : "",
+              isCorrect: selectedOpt ? !!selectedOpt.isCorrect : false
+            };
+          })
+        };
+        const results = getJSON(STORAGE.results, []);
+        results.push({ ...result, answers: result.answers });
+        setJSON(STORAGE.results, results);
+        lastResult = result;
+        renderResult(result); currentExam = null; show("resultView"); window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      function renderResult(result) {
+        $("resultSubject").textContent = result.subjectTitle;
+        $("resultScore").textContent = `${result.correct} / ${result.total}`;
+        $("resultDetails").textContent = `Faiz: ${result.percent}% · Səhv: ${result.wrong} · Cavabsız: ${result.unanswered} · Vaxt: ${formatSeconds(result.spentSeconds)}${result.autoSubmit ? " · Vaxt bitdiyi üçün avtomatik yekunlaşdı" : ""}`;
+        const review = $("reviewBox");
+        review.innerHTML = `<h3>Cavabların icmalı</h3><table><thead><tr><th>#</th><th>Excel №</th><th>Sual</th><th>Seçilən cavab</th><th>Düzgün cavab</th><th>Status</th></tr></thead><tbody>${result.answers.map(a => `<tr><td>${a.no}</td><td>${escapeHTML(a.originalNo)}</td><td>${escapeHTML(a.question)}</td><td>${escapeHTML(a.selected)}</td><td>${escapeHTML(a.correct)}</td><td>${a.isCorrect ? "Düzgün" : "Səhv / Cavabsız"}</td></tr>`).join("")}</tbody></table>`;
+        review.classList.add("hidden");
+      }
+      function renderStudentPanel() {
+        renderSubjectSelects();
+        $("studentInfoBox").innerHTML = `<b>${escapeHTML(currentUser.fullName)}</b><br>Qrup: ${escapeHTML(currentUser.group || CONFIG.group)}<br>İmtahan: ${CONFIG.examTitle}`;
+        $("studentResultsBox").classList.add("hidden");
+      }
+      function renderStudentResults() {
+        const box = $("studentResultsBox");
+        const results = getJSON(STORAGE.results, []).filter(r => r.username === currentUser.username).sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+        if (!results.length) {
+          box.innerHTML = `<h3>Nəticələrim</h3><div class="alert warn">Hələ nəticə yoxdur.</div>`;
+        } else {
+          box.innerHTML = `<h3>Nəticələrim</h3><table><thead><tr><th>Tarix</th><th>Fənn</th><th>Nəticə</th><th>Faiz</th><th>Səhv</th><th>Cavabsız</th><th>Vaxt</th></tr></thead><tbody>${results.map(r => `<tr><td>${formatDate(r.finishedAt)}</td><td>${escapeHTML(r.subjectTitle)}</td><td><b>${r.correct}/${r.total}</b></td><td>${r.percent}%</td><td>${r.wrong}</td><td>${r.unanswered}</td><td>${formatSeconds(r.spentSeconds)}</td></tr>`).join("")}</tbody></table>`;
+        }
+        box.classList.toggle("hidden");
+      }
+      function renderAdmin() {
+        renderSubjectSelects();
+        const users = getJSON(STORAGE.users, []);
+        const results = getJSON(STORAGE.results, []);
+        const totalQuestions = SUBJECTS.reduce((sum, s) => sum + s.questions.length, 0);
+        $("subjectCountPill").textContent = `Fənn: ${SUBJECTS.length}`;
+        $("questionCountPill").textContent = `Sual: ${totalQuestions}`;
+        $("studentCountPill").textContent = `Tələbə: ${users.filter(u => u.role === "student").length}`;
+        $("resultCountPill").textContent = `Nəticə: ${results.length}`;
+        renderSubjectsBox(); renderScoreboard(); renderStudents();
+      }
+      function renderSubjectsBox() {
+        $("subjectsBox").innerHTML = SUBJECTS.map(s => {
+          const missing = s.questions.filter(q => q.missingQuestionText).length;
+          const imageCount = s.questions.reduce((sum, q) => sum + ((q.question.images || []).length) + q.options.reduce((os, o) => os + ((o.images || []).length), 0), 0);
+          return `<div class="subject-card"><h4>${escapeHTML(s.title)}</h4><p>Mənbə: ${escapeHTML(s.sourceFile || "Excel")}</p><p>Sual sayı: <b>${s.questions.length}</b> · Şəkil: ${imageCount}${missing ? ` · <span class="subject-warning">boş sual mətni: ${missing}</span>` : ""}</p></div>`;
+        }).join("");
+      }
+      function renderScoreboard() {
+        const filter = $("scoreboardSubjectFilter").value || "all";
+        const allResults = getJSON(STORAGE.results, []);
+        const sortResults = arr => arr.sort((a, b) => { if (b.correct !== a.correct) return b.correct - a.correct; return a.spentSeconds - b.spentSeconds; });
+        const tableFor = (results, title) => {
+          if (!results.length) return `<h4>${escapeHTML(title)}</h4><div class="alert warn">Bu fənn üzrə hələ nəticə yoxdur.</div>`;
+          return `<h4>${escapeHTML(title)}</h4><table><thead><tr><th>Yer</th><th>Tələbə</th><th>Qrup</th><th>Nəticə</th><th>Faiz</th><th>Səhv</th><th>Cavabsız</th><th>Vaxt</th><th>Tarix</th></tr></thead><tbody>${sortResults(results).map((r, index) => `<tr><td>${index + 1}</td><td><b>${escapeHTML(r.fullName)}</b><br><span class="muted small">${escapeHTML(r.username)}</span></td><td>${escapeHTML(r.group)}</td><td><b>${r.correct}/${r.total}</b></td><td>${r.percent}%</td><td>${r.wrong}</td><td>${r.unanswered}</td><td>${formatSeconds(r.spentSeconds)}</td><td>${formatDate(r.finishedAt)}</td></tr>`).join("")}</tbody></table>`;
+        };
+        const box = $("scoreboardBox");
+        if (filter !== "all") {
+          const subject = SUBJECTS.find(s => s.id === filter);
+          const results = allResults.filter(r => r.subjectId === filter);
+          box.innerHTML = tableFor(results, subject ? subject.title : "Seçilmiş fənn");
+          return;
+        }
+        box.innerHTML = SUBJECTS.map(s => `<div style="margin-bottom:22px;">${tableFor(allResults.filter(r => r.subjectId === s.id), s.title)}</div>`).join("");
+      }
+      function renderStudents() {
+        const users = getJSON(STORAGE.users, []).filter(u => u.role === "student");
+        $("studentsBox").innerHTML = users.length ? `<table><thead><tr><th>Ad Soyad</th><th>Login</th><th>Qrup</th></tr></thead><tbody>${users.map(u => `<tr><td>${escapeHTML(u.fullName)}</td><td>${escapeHTML(u.username)}</td><td>${escapeHTML(u.group || CONFIG.group)}</td></tr>`).join("")}</tbody></table><div class="alert warn small">Parollar təhlükəsizlik üçün public GitHub paketində göstərilmir. Şəxsi giriş CSV faylını ayrıca saxlayın və repositoriyaya yükləməyin.</div>` : `<div class="alert warn">Tələbə əlavə olunmayıb.</div>`;
+      }
+      async function addStudent() {
+        const fullName = $("newStudentName").value.trim(), username = $("newStudentUser").value.trim(), password = $("newStudentPass").value.trim();
+        if (!fullName || !username || !password) { $("addStudentMsg").innerHTML = `<div class="alert danger">Bütün xanaları doldurun.</div>`; return; }
+        const users = getJSON(STORAGE.users, []);
+        if (users.some(u => u.username === username)) { $("addStudentMsg").innerHTML = `<div class="alert danger">Bu login artıq mövcuddur.</div>`; return; }
+        const passwordHash = await sha256Hex(password);
+        users.push({ username, passwordHash, fullName, role: "student", group: CONFIG.group }); setJSON(STORAGE.users, users);
+        $("newStudentName").value = ""; $("newStudentUser").value = ""; $("newStudentPass").value = "";
+        $("addStudentMsg").innerHTML = `<div class="alert success">Tələbə əlavə edildi. Parolu ayrıca qeyd edin; sistem parolu açıq şəkildə saxlamır.</div>`; renderAdmin();
+      }
+      function resetResults() {
+        if (!confirm("Bütün imtahan nəticələri silinsin?")) return;
+        setJSON(STORAGE.results, []); renderAdmin();
+      }
+      function downloadCredentials() {
+        const users = getJSON(STORAGE.users, []).filter(u => u.role === "student");
+        const rows = [["no", "fullName", "username", "group", "note"]];
+        users.forEach((u, idx) => rows.push([idx + 1, u.fullName, u.username, u.group || CONFIG.group, "Parollar public paketdə saxlanmır; şəxsi CSV faylından istifadə edin."]));
+        const csv = rows.map(row => row.map(csvEscape).join(",")).join("\n");
+        downloadFile("telebeler_login_siyahisi_public.csv", csv, "text/csv;charset=utf-8");
+      }
+      function downloadScores() {
+        const results = getJSON(STORAGE.results, []);
+        const rows = [["place", "subject", "fullName", "username", "group", "correct", "total", "percent", "wrong", "unanswered", "spentSeconds", "finishedAt"]];
+        results.sort((a, b) => { if (b.correct !== a.correct) return b.correct - a.correct; return a.spentSeconds - b.spentSeconds; }).forEach((r, idx) => rows.push([idx + 1, r.subjectTitle, r.fullName, r.username, r.group, r.correct, r.total, r.percent, r.wrong, r.unanswered, r.spentSeconds, r.finishedAt]));
+        const csv = rows.map(row => row.map(csvEscape).join(",")).join("\n");
+        downloadFile("scoreboard_2531_mut_4_fenn.csv", csv, "text/csv;charset=utf-8");
+      }
+      function downloadFile(filename, content, type) {
+        const blob = new Blob([content], { type }); const url = URL.createObjectURL(blob); const a = document.createElement("a");
+        a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
+      }
+      function csvEscape(value) {
+        const s = String(value ?? ""); return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      }
+      function formatSeconds(seconds) {
+        seconds = Math.max(0, Number(seconds) || 0); const m = Math.floor(seconds / 60); const s = seconds % 60; return `${m} dəq ${s} san`;
+      }
+      function formatDate(iso) { try { return new Date(iso).toLocaleString("az-AZ"); } catch { return iso; } }
+      function escapeHTML(str) { return String(str ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
+      function escapeAttr(str) { return escapeHTML(str).replaceAll("`", "&#096;"); }
+      function contentToHTML(content, fallback) {
+        const text = String(content && content.text ? content.text : "").trim();
+        const images = Array.isArray(content && content.images) ? content.images : [];
+        let out = text ? escapeHTML(text).replace(/\n/g, "<br>") : `<span class="muted">${escapeHTML(fallback)}</span>`;
+        images.forEach(img => {
+          const w = Number(img.width) || 0, h = Number(img.height) || 0;
+          const widthAttr = w ? ` width="${Math.min(w, 560)}"` : "";
+          const heightAttr = h && w <= 560 ? ` height="${h}"` : "";
+          out += `<img class="content-img" src="${img.src}"${widthAttr}${heightAttr} alt="sual şəkli">`;
+        });
+        return out;
+      }
+      function contentSummary(content) {
+        const text = String(content && content.text ? content.text : "").replace(/\s+/g, " ").trim();
+        const imgs = Array.isArray(content && content.images) ? content.images.length : 0;
+        if (text && imgs) return text + " [şəkil var]";
+        if (text) return text;
+        if (imgs) return "[şəkil formatlı sual]";
+        return "Sual mətni yoxdur";
+      }
+      function optionSummary(opt) {
+        const text = String(opt && opt.text ? opt.text : "").replace(/\s+/g, " ").trim();
+        const imgs = Array.isArray(opt && opt.images) ? opt.images.length : 0;
+        if (text && imgs) return text + " [şəkil var]";
+        if (text) return text;
+        if (imgs) return "[şəkil variantı]";
+        return "Variant mətni boşdur";
+      }
+      function attachEvents() {
+        $("loginBtn").addEventListener("click", login);
+        $("password").addEventListener("keydown", e => { if (e.key === "Enter") login(); });
+        $("logoutBtn1").addEventListener("click", logout); $("logoutBtn2").addEventListener("click", logout);
+        $("startExamBtn").addEventListener("click", startExam); $("studentResultsBtn").addEventListener("click", renderStudentResults);
+        $("submitExamBtn").addEventListener("click", () => finishExam(false)); $("scrollTopBtn").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+        $("backToPanelBtn").addEventListener("click", () => { renderStudentPanel(); show("studentView"); });
+        $("reviewAnswersBtn").addEventListener("click", () => $("reviewBox").classList.toggle("hidden"));
+        $("resetResultsBtn").addEventListener("click", resetResults); $("refreshScoreboardBtn").addEventListener("click", renderAdmin);
+        $("downloadScoresBtn").addEventListener("click", downloadScores); $("downloadCredentialsBtn").addEventListener("click", downloadCredentials); $("addStudentBtn").addEventListener("click", addStudent);
+        $("scoreboardSubjectFilter").addEventListener("change", renderScoreboard);
+      }
+      function boot() {
+        initStorage(); attachEvents();
+        if (!SUBJECTS.length) alert("Sual məlumatları tapılmadı. questions-data.js faylının index.html ilə eyni qovluqda olduğuna əmin olun.");
+        const session = getJSON(STORAGE.session, null);
+        if (session && session.username) {
+          const users = getJSON(STORAGE.users, []); const user = users.find(u => u.username === session.username);
+          if (user) { currentUser = user; setBadge(); if (user.role === "admin") { renderAdmin(); show("adminView"); } else { renderStudentPanel(); show("studentView"); } return; }
+        }
+        setBadge(); show("loginView");
+      }
+      boot();
+    })();
+  </script>
+</body>
+</html>
